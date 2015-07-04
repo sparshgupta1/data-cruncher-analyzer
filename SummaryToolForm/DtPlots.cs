@@ -1,0 +1,646 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms.DataVisualization.Charting;
+using System.Data;
+using SummaryTool;
+using System.Windows.Forms;
+using System.Drawing;
+using DragNDrop;
+using System.Text.RegularExpressions;
+
+namespace SummaryToolForm
+{
+    public class DtPlots
+    {
+        public DataGridView SumdataGridView;
+        public DataGridView HighSummaryDataGridView;
+        public DataGridView FilterdataGridView;
+        public DataGridView BpdataGridView;
+        public DataGridView EditdataGridView;
+
+        public DataTable dtSum;
+        public DataTable dhtSum;
+        public DataTable dtChartSum;
+        public SummaryMainClass sm;
+        //public DataCrunch.DataCrunchClass dc;
+        public Chart chart1;
+        public string toolStripStatusLabel;
+        public string TypicalLotFilter;
+        public bool enableChartSumFlag;
+        public bool enableChartFlag;
+        public InputFields InputFields1;
+        public PopupForm f;
+        public DtPlots(InputFields If, DataGridView[] dgv, Chart chart) //DNDLV[] ddlv,)
+        {
+            InputFields1 = If;
+
+            SumdataGridView = dgv[0];
+            HighSummaryDataGridView = dgv[1]; 
+            FilterdataGridView = dgv[2];
+            BpdataGridView = dgv[3];
+            EditdataGridView = dgv[4];
+
+            chart1 = chart;
+            enableChartFlag = true;
+            enableChartSumFlag = true;
+        }
+        public void ShowPopup(string header)
+        {
+            header = SummaryMainClass.ChangeData(header);
+            var rowList = sm.pvt._SourceTable.DefaultView.ToTable(true, new string[] { header }).AsEnumerable().ToList(); //.ToList();
+            foreach (var entry in rowList)
+                f.DragNDropListView1.Items.Add(entry.ItemArray[0].ToString());
+
+            f.ShowDialog();
+            string[] RowItems;
+            RowItems = new string[f.DragNDropListView1.SelectedItems.Count];
+
+            for (int i = 0; i < f.DragNDropListView1.SelectedItems.Count; i++)
+                RowItems[i] = f.DragNDropListView1.SelectedItems[i].Text;
+            sm.pvt.FilterSource(new string[] { header }, RowItems);
+        }
+        public void summaryInit()
+        {
+            sm = new SummaryMainClass();
+        }
+        public void CreateSpec()
+        {
+            if (InputFields1.SumRowfield == null && InputFields1.SumColumnfield == null) refreshDgv();
+            if (InputFields1.Datafield.Length == 0 || (InputFields1.SumRowfield.Length == 0 && InputFields1.SumColumnfield.Length == 0)) { toolStripStatusLabel = "Row/Loop input or Data cannot be empty"; return; }
+
+            DataTable table = sm.pvt.CreateSpec(InputFields1.Datafield, InputFields1.Aggregate, InputFields1.SumRowfield, InputFields1.SumColumnfield, InputFields1.NSigma);
+
+            EditdataGridView.DataSource = table.DefaultView;
+
+            return;
+        }
+        static DataTable ConvertListToDataTable(List<string[]> list, string[] Inputfield)
+        {
+            // New table.
+            DataTable table = new DataTable();
+
+            // Get max columns.
+            int columns = 0;
+            foreach (var array in list)
+            {
+                if (array.Length > columns)
+                {
+                    columns = array.Length;
+                }
+            }
+
+            // Add columns.
+            for (int i = 0; i < Inputfield.Length; i++)
+            {
+                table.Columns.Add(Inputfield[i]);
+            }
+
+            // Add rows.
+            foreach (var array in list)
+            {
+                table.Rows.Add(array);
+            }
+
+            return table;
+        }
+        /// <summary>
+        /// Refreshes the Datagridview
+        /// </summary>
+        /// <param name="dgv"></param>
+        /// <param name="e"></param>
+        public void refreshDgv(int dgv = 1, DataGridViewCellEventArgs e = null)
+        {
+            if (dgv == 1)
+            {
+                SumdataGridView.DataSource = null;
+                HighSummaryDataGridView.DataSource = null;
+                if ((InputFields1.SumRowfield == null && InputFields1.SumColumnfield == null)) { return; }
+                if (InputFields1.Datafield == null) { return; }
+
+                toolStripStatusLabel = "Generating Summary...";
+                dtSum = sm.SummaryData(InputFields1.Datafield[0], InputFields1.SumRowfield, InputFields1.SumColumnfield, InputFields1.Aggregate, InputFields1.NSigma);
+                toolStripStatusLabel = sm.errormsg;
+
+                dhtSum = sm.HighSummaryData(InputFields1.Datafield[0],InputFields1.Iterator,InputFields1.SumRowfield, InputFields1.SumColumnfield, new AggregateFunction[] { AggregateFunction.Max,AggregateFunction.Min,AggregateFunction.Average,AggregateFunction.NSigmaNegMin,AggregateFunction.NSigmaPosMax,AggregateFunction.NSigmaNegCorrespondingStdDev,AggregateFunction.NSigmaPosCorrespondingStdDev}, InputFields1.NSigma);
+                toolStripStatusLabel += sm.errormsg;
+
+                SumdataGridView.DataSource = dtSum.DefaultView;
+                HighSummaryDataGridView.DataSource = dhtSum.DefaultView;
+
+                GenerateNSaveChart("", false);
+
+                if (string.IsNullOrEmpty(sm.errormsg)) toolStripStatusLabel = "Ready";
+                sm.errormsg = "";
+            }
+            else if (dgv == 2)
+            {
+                int[] CurrentPosition = new int[] { e.RowIndex, e.ColumnIndex };
+                toolStripStatusLabel = "Pulling from Raw Data...";
+                DataTable dtpull = sm.PullData(InputFields1.Datafield[0], InputFields1.SumRowfield, InputFields1.SumColumnfield, InputFields1.Aggregate, InputFields1.NSigma, CurrentPosition);
+                FilterdataGridView.DataSource = dtpull.DefaultView;
+                toolStripStatusLabel = "Ready";
+            }
+        }
+        public void ClearPlot()
+        {
+            //Init chart
+            this.chart1.Legends.Clear();
+
+        }
+        public void DtBoxPlot(DataTable dtbp, DataTable dtsm, string XaxisName = "", string YaxisName = "", string AdditionalFilter = "", string AdditionalSpecFilter = "")
+        {
+            //Alternate chart reference http://www.codeproject.com/Articles/5431/A-flexible-charting-library-for-NET
+            //Add title
+            string title = SummaryMainClass.RestoreData(AdditionalFilter).Replace(" and ", "").Replace("= '", ":").Replace("'", ", ");
+            if (title.Length > 1) title = title.Remove(title.Length - 2);
+            if (chart1.Titles.Count == 0) chart1.Titles.Add(title);
+            chart1.Titles[0].Text = title;
+
+            //Init chart
+            this.chart1.Legends.Clear();
+            this.chart1.ChartAreas.Clear();
+            this.chart1.Series.Clear();
+            //Data area
+            ChartArea area = new ChartArea("Area");
+            this.chart1.ChartAreas.Add(area);
+
+            string bpSeries = string.Empty;
+            List<double> XValues = new List<double>();
+            List<string> XActual = new List<string>();
+            //Create Box Plot series
+            int ZoomIndex = 10;
+            //ZoomIndex = 200/dtbp.Columns.Count;
+            int k = 1;
+            for (int i = 0; i < dtbp.Columns.Count; i++)
+            {
+                //int i = dtbp.Columns.Count-1;
+                string seriesName = dtbp.Columns[i].ToString();
+                seriesName = seriesName.Replace("#", "");
+                if (!seriesName.Contains("Spec") && seriesName.Contains("FullArray"))
+                {
+                    Series series = new Series(seriesName);
+                    series.ChartArea = area.Name;
+                    series.ChartType = SeriesChartType.Point;
+                    series.Color = Color.Transparent;
+                    series.ShadowColor = Color.Transparent;
+                    series.BorderColor = Color.Transparent;
+                    int j = 0;
+                    double xval = new double();
+                    foreach (DataRow dataRow in dtbp.Rows)
+                    {
+                        string[] strArr = dataRow[i].ToString().Split(',');
+                        xval = k * ZoomIndex;
+                        foreach (string str in strArr) if (str != "" & !str.Contains("Error")) { series.Points.AddXY(xval, Convert.ToDouble(str)); System.Diagnostics.Debug.Print(str + "\t"); } //System.Diagnostics.Debug.Print("bp" + xval + " " + str);// 
+                        j++;
+                    }
+                    this.chart1.Series.Add(series);
+                    XValues.Add(xval);
+                    XActual.Add(seriesName.Replace("FullArray", ""));
+                    k++;
+                    bpSeries = bpSeries + ";" + seriesName;
+                }
+            }
+            k = 1;
+            if (true)
+            {
+                //Create colors as per series
+                int DataRows = 1;
+                foreach (DataRow dataRow in dtbp.Rows)
+                {
+                    string seriesName = dtbp.Columns[1].ToString();
+                    int startCol = 2;
+                    if (seriesName.Contains("FullArray")) { seriesName = ""; startCol = 0; }
+                    else { seriesName = seriesName + "=" + dataRow[1].ToString(); }
+                    Series series = new Series(seriesName);
+                    series.ChartArea = area.Name;
+                    series.ChartType = SeriesChartType.Point;
+
+                    //Combine columns to make the series data
+                    k = 1;
+                    for (int i = startCol; i < dtbp.Columns.Count; i++)
+                    {
+                        string[] strArr = dataRow[i].ToString().Split(',');
+                        double xval = new double();
+                        xval = k * ZoomIndex;
+                        foreach (string str in strArr) if (str != "" & !str.Contains("Error")) { series.Points.AddXY(xval, Convert.ToDouble(str)); }//System.Diagnostics.Debug.Print("Se" + xval + " " + str); 
+                        k++;
+                    }
+                    //seriesArray.Add(series);
+                    chart1.Series.Add(series);
+                    //chart1.Series[chart1.Series.Count - 1].Color = CreateUniqueColors(chart1.Series.Count);
+                    chart1.Series[chart1.Series.Count - 1].Color = CreateUniqueColors(DataRows);
+                    //Enable Legend
+                    var legendItem = new LegendItem();
+                    legendItem.SeriesName = series.Name;
+                    legendItem.ImageStyle = LegendImageStyle.Rectangle;
+                    legendItem.Color = chart1.Series[chart1.Series.Count - 1].Color;
+                    //legendItem.BorderColor = chart1.Series[chart1.Series.Count -1 ].Color; //series.Color; // Color.Transparent;
+                    legendItem.Name = series.Name + "_legend_item";
+
+                    int p = legendItem.Cells.Add(LegendCellType.SeriesSymbol, "", ContentAlignment.MiddleCenter);
+                    legendItem.Cells.Add(LegendCellType.Text, series.Name, ContentAlignment.MiddleCenter);
+
+                    if (series.Enabled)
+                        legendItem.Color = CreateUniqueColors(DataRows); //Color.DarkBlue; //chart1.Series[chart1.Series.Count - 1].Color; // series.Color;
+                    else
+                        legendItem.Color = Color.FromArgb(100, series.Color);
+                    chart1.Legends.Add(new Legend());
+                    chart1.Legends.Add(new Legend());
+                    chart1.Legends[0].Enabled = false;
+                    chart1.Legends[1].CustomItems.Add(legendItem);
+                    chart1.Legends[1].Enabled = true;
+                    DataRows++;
+                }
+            }
+            k = 1;
+            if (false) //Old method Specific to Temp
+                for (int i = 0; i < dtbp.Columns.Count; i++)
+                {
+                    string seriesName = dtbp.Columns[i].ToString();
+                    seriesName = seriesName.Replace("#", "");
+                    if (!seriesName.Contains("Spec"))
+                    {
+                        int j = 0;
+                        double xval = new double();
+                        foreach (DataRow dataRow in dtbp.Rows)
+                        {
+                            if (dataRow[i].ToString() != "")
+                            {
+                                seriesName = seriesName + j;
+                                Series series = new Series(seriesName);
+                                series.ChartArea = area.Name;
+                                series.ChartType = SeriesChartType.Point;
+                                if (dataRow[0].ToString() == "-40") series.Color = Color.DarkBlue;
+                                if (dataRow[0].ToString() == "-10") series.Color = Color.Blue;
+                                if (dataRow[0].ToString() == "25") series.Color = Color.Green;
+                                if (dataRow[0].ToString() == "70") series.Color = Color.Pink;
+                                if (dataRow[0].ToString() == "80") series.Color = Color.FromArgb(100, Color.Red);
+                                if (dataRow[0].ToString() == "85") series.Color = Color.FromArgb(150, Color.Red);
+                                if (dataRow[0].ToString() == "90") series.Color = Color.FromArgb(200, Color.Red);
+                                if (dataRow[0].ToString() == "100") series.Color = Color.FromArgb(220, Color.Red);
+                                if (dataRow[0].ToString() == "110") series.Color = Color.FromArgb(230, Color.Red);
+                                if (dataRow[0].ToString() == "120") series.Color = Color.FromArgb(250, Color.Red);
+
+                                this.chart1.Series.Add(series);
+                                string[] strArr = dataRow[i].ToString().Split(',');
+                                xval = k * ZoomIndex;
+                                foreach (string str in strArr) if (str != "") series.Points.AddXY(xval, Convert.ToDouble(str));
+                                j++;
+                            }
+                        }
+                        k++;
+                    }
+                }
+            if (bpSeries != "") bpSeries = bpSeries.Substring(1);
+
+            area.AxisX.Title = SummaryMainClass.RestoreData(XaxisName);
+            area.AxisY.Title = SummaryMainClass.RestoreData(YaxisName);
+
+            //Temp series (Note this series has to be added BEFORE the BoxPlot series)
+            Series tempSeries = new Series("TempSeries");
+            tempSeries.ChartArea = area.Name;
+            //To hide the series. Setting .Enabled = false will not have the desired effect.
+            tempSeries.Color = Color.Transparent;
+            tempSeries.Points.AddXY(1, 0); //XValue <> 0, so that it will not be treated as indexed
+            this.chart1.Series.Add(tempSeries);
+
+            //BoxPlot series
+            Series seriesBox = new Series("BoxPlot");
+            seriesBox.Color = Color.FromArgb(60, seriesBox.Color);
+            // seriesBox.Palette = ChartColorPalette.SemiTransparent;
+
+            seriesBox.ChartArea = area.Name;
+            seriesBox.ChartType = SeriesChartType.BoxPlot;
+            seriesBox["BoxPlotSeries"] = bpSeries;//combines series names "Series1;Series2;Series3";
+            //seriesBox["BoxPlotShowMedian"] = "true";
+            //seriesBox["BoxPlotShowAverage"] = "true";
+            //seriesBox["BoxPlotShowUnusualValues"] = "true";
+            seriesBox["BoxPlotWhiskerPercentile"] = "10";
+            seriesBox["BoxPlotPercentile"] = "30";
+            this.chart1.Series.Add(seriesBox);
+
+            chart1.ApplyPaletteColors();
+
+            double[] statistics = new double[] { };
+            statistics = ApplyStatisticLines(dtsm, XValues, AdditionalFilter, AdditionalSpecFilter, YaxisName);
+
+            //Get the min and max of chart scale from the plotted data     
+            //double xmin,ymin,xmax,ymax;
+            //         xmin = Convert.ToDouble(chart1.Series[0].Points[0].XValue);
+            //         xmax = xmin;
+            //         ymin = Convert.ToDouble(chart1.Series[0].Points[0].YValues[0]);
+            //         ymax = ymin;
+
+            //     foreach (var series in chart1.Series)
+            //     {
+            //         foreach (var point in series.Points)
+            //         {
+            //             xmin = (xmin < Convert.ToDouble(point.XValue)) ? xmin : point.XValue;
+            //             ymin = (ymin < Convert.ToDouble(point.YValues[0])) ? ymin : point.YValues[0];
+            //             xmax = (xmax > Convert.ToDouble(point.XValue)) ? xmax : point.XValue;
+            //             ymax = (ymax > Convert.ToDouble(point.YValues[0])) ? ymax : point.YValues[0];
+            //            // point.Color = Color.FromArgb(220, point.Color);
+            //         }
+            //     }
+            //Max(Range(Cells(1, 1), Cells(4, PT.PivotFields("Voltage1").PivotItems.Count)).Offset(row_count - 11, 1)) + (Max(Range(Cells(1, 1), Cells(4, PT.PivotFields("Voltage1").PivotItems.Count)).Offset(row_count - 11, 1)) - Min(Range(Cells(1, 1), Cells(4, PT.PivotFields("Voltage1").PivotItems.Count)).Offset(row_count - 11, 1))) / 20
+            //Min(Range(Cells(1, 1), Cells(4, PT.PivotFields("Voltage1").PivotItems.Count)).Offset(row_count - 11, 1)) - (Max(Range(Cells(1, 1), Cells(4, PT.PivotFields("Voltage1").PivotItems.Count)).Offset(row_count - 11, 1)) - Min(Range(Cells(1, 1), Cells(4, PT.PivotFields("Voltage1").PivotItems.Count)).Offset(row_count - 11, 1))) / 20
+
+            //Setup Grids
+            area.AxisX.MajorGrid.Enabled = false;
+            area.AxisY.MajorGrid.Enabled = false;
+            area.AxisX.MinorGrid.Enabled = true;
+            area.AxisX.MinorGrid.LineColor = Color.FromArgb(25, seriesBox.Color);
+            area.AxisY.MinorGrid.Enabled = true;
+            area.AxisY.MinorGrid.LineColor = Color.FromArgb(25, seriesBox.Color);
+            area.AxisX.MinorGrid.Interval = 1;
+
+            //To make the chart look nice...
+            double minY = statistics.Min();
+            double maxY = statistics.Max();
+
+            System.Diagnostics.Debug.Print("min " + minY.ToString() + " Max " + maxY.ToString());
+
+            area.RecalculateAxesScale();
+            if ((minY - (maxY - minY) / 20).ToString() != "-Infinity") area.AxisY.Minimum = minY - (maxY - minY) / 20; //area.AxisY.Minimum;//22.4; //
+            if ((maxY + (maxY - minY) / 20).ToString() != "Infinity") area.AxisY.Maximum = maxY + (maxY - minY) / 20; //area.AxisY.Maximum + area.AxisY.Maximum * 0.05;//23;//
+            area.AxisX.Minimum = 0;// area.AxisX.Minimum;//
+            if (XValues.Count > 1) area.AxisX.Maximum = XValues[XValues.Count - 1] + 6 * XValues[1];  //area.AxisX.Maximum;
+            seriesBox["MaxPixelPointWidth"] = "20";
+
+            double first = Convert.ToDouble(System.Text.RegularExpressions.Regex.Match(XValues[0].ToString(), @"\d+").Value);
+            var XAxis = chart1.ChartAreas[0].AxisX;
+
+            double StartPos = Convert.ToDouble(System.Text.RegularExpressions.Regex.Match(XValues[0].ToString(), @"\d+").Value);
+            double EndPos = new int();
+
+            //Truncate the Y axis Values
+            chart1.ChartAreas[0].AxisY.LabelStyle.TruncatedLabels = true;
+
+            int icount = 0;
+            int labelWidth = 5; //1
+            if (XActual.Count > 10) labelWidth = 5;
+            if (XActual.Count > 15) labelWidth = 8;
+            foreach (int Xval in XValues)
+            {
+                EndPos = StartPos + labelWidth;
+
+                //chart1.ChartAreas[0].AxisX.CustomLabels.Add(StartPos, EndPos, XActual[icount].ToString(), 0, LabelMarkStyle.None); //StartPos.ToString("f") replaced with  XActual[icount].ToString()
+                chart1.ChartAreas[0].AxisX.CustomLabels.Add(StartPos, EndPos, XActual[icount].ToString(), 0, LabelMarkStyle.Box);
+                StartPos = Xval + ZoomIndex;
+                icount++;
+            }
+            ChartRedraw();
+            return;
+        }
+        /// <summary>
+        /// Arranges the chart in X-Axis or horizontally
+        /// </summary>
+        public void ChartRedraw()
+        {
+            int counter = 10;
+            try
+            {
+                foreach (DataPoint dp in this.chart1.Series["BoxPlot"].Points)
+                {
+                    dp.XValue = counter;
+                    counter += 10;
+                }
+
+                //Identify the decimal points needed
+                int decimals = 99;
+                if (chart1.ChartAreas[0].AxisY.CustomLabels.Count > 0)
+                {
+                    decimal value, value2;
+                    if (decimal.TryParse(chart1.ChartAreas[0].AxisY.CustomLabels[0].Text, out value) | decimal.TryParse(chart1.ChartAreas[0].AxisY.CustomLabels[1].Text, out value2))
+                    {
+                        value = Math.Round(value);
+                        value2 = Math.Round(value2);
+                        if (value2 != value) { decimals = 0; }
+                    }
+                }
+                foreach (var Label1 in chart1.ChartAreas[0].AxisY.CustomLabels)
+                {
+                    Label1.Text = Label1.Text;
+                    decimal value;
+                    if (decimals == 0)
+                        if (decimal.TryParse(Label1.Text, out value))
+                        {
+                            value = Math.Round(value);
+                            Label1.Text = value.ToString();
+                            // Do something with the new text value
+                        }
+                }
+
+            }
+            catch { }
+        }
+
+        public Color CreateUniqueColors(int nthColor)
+        {
+            
+           Color[] ac = new Color[] {Color.Blue,Color.Green,Color.Red,Color.Yellow,Color.Chocolate,Color.BlueViolet,Color.DarkGoldenrod,Color.DeepPink,Color.LightPink,Color.Goldenrod,Color.Thistle};
+            
+            // For 5 temp
+            //Color[] ac = new Color[] { Color.DarkBlue, Color.LightBlue, Color.Green, Color.Pink, Color.Red, Color.BlueViolet, Color.DarkGoldenrod, Color.DeepPink, Color.LightPink, Color.Goldenrod, Color.Thistle };
+            if (nthColor < 11) return ac[nthColor - 1];
+            Random rnd = new Random();
+            string name = "Unknown";
+            int colorCount = 0;
+            Color c = Color.FromArgb(200, 0, 0);
+            int Randint = rnd.Next(52);//50;
+            foreach (KnownColor kc in Enum.GetValues(typeof(KnownColor)))
+            {
+
+                Color known = Color.FromKnownColor(kc);
+                if (nthColor + Randint == colorCount)
+                {
+                    name = known.Name;
+                    c = known;
+                }
+                colorCount++;
+            }
+            return c;
+        }
+        public double[] ApplyStatisticLines(DataTable dtsm, List<double> XValues, string AdditionalFilter = "", string AdditionalSpecFilter = "", string Data = "")
+        {
+            double Xlength;
+            if (XValues.Count > 1) Xlength = XValues[XValues.Count - 1] + 2 * XValues[1];
+            else Xlength = XValues[0];
+            //Add extra lines for min max stdev etc
+            if (AdditionalFilter != "") AdditionalFilter = AdditionalFilter.Substring(0, AdditionalFilter.Length - 5);
+            if (AdditionalSpecFilter != "") AdditionalSpecFilter = AdditionalSpecFilter.Substring(0, AdditionalSpecFilter.Length - 5);
+
+            DataRow[] FilteredRows = sm.pvt._SourceTable.Select(AdditionalFilter); //Get all data
+            DataRow[] SpecFilteredRows = sm.pvt._SpecTable.Select(AdditionalSpecFilter); //Get all data
+
+            //DataRow[] FilteredTypicalRows = dtbp.Select(TypicalLotFilter); //Get all data
+            string combinedFilter = "";
+            if (TypicalLotFilter != "" & AdditionalFilter != "") combinedFilter = AdditionalFilter + " and " + TypicalLotFilter; else if (TypicalLotFilter != "") combinedFilter = TypicalLotFilter; else combinedFilter = AdditionalFilter;
+            DataRow[] FilteredTypicalRows = dtsm.Select(combinedFilter); //Get all data
+
+            List<double> OutArray = new List<double>();
+
+            double specMin = new double();
+            double specMax = new double();
+            double Average = new double();
+            double Min = new double();
+            double Max = new double();
+            double NSigmaPos = new double();
+            double NSigmaNeg = new double();
+
+            try
+            {
+                object[] objList = SpecFilteredRows.Select(x => x.Field<object>(Data + "_Min")).ToArray();
+                var minSample = sm.pvt.GetMin(objList);
+                if (double.TryParse(minSample.ToString(), out specMin)) OutArray.Add(specMin);
+            }
+            catch { }
+            try { if (double.TryParse(sm.pvt.GetMax(SpecFilteredRows.Select(x => x.Field<object>(Data + "_Max")).ToArray()).ToString(), out specMax)) OutArray.Add(specMax); }
+            catch { }
+            try { if (double.TryParse(sm.pvt.GetAverageOmitNull(FilteredRows.Select(x => x.Field<object>(Data)).ToArray()).ToString(), out Average)) OutArray.Add(Average); }
+            catch { }
+            try { if (double.TryParse(sm.pvt.GetMin(FilteredRows.Select(x => x.Field<object>(Data)).ToArray()).ToString(), out Min)) OutArray.Add(Min); }
+            catch { }
+            try { if (double.TryParse(sm.pvt.GetMax(FilteredRows.Select(x => x.Field<object>(Data)).ToArray()).ToString(), out Max)) OutArray.Add(Max); }
+            catch { }
+            try { if (double.TryParse(sm.pvt.GetMax(FilteredTypicalRows.Select(x => x.Field<object>("+" + SummaryMainClass.NSigma.ToString() + "Sigma")).ToArray()).ToString(), out NSigmaPos)) if (NSigmaPos.ToString() != "NaN") OutArray.Add(NSigmaPos); }
+            catch { }
+            try { if (double.TryParse(sm.pvt.GetMin(FilteredTypicalRows.Select(x => x.Field<object>("-" + SummaryMainClass.NSigma.ToString() + "Sigma")).ToArray()).ToString(), out NSigmaNeg)) if (NSigmaNeg.ToString() != "NaN") OutArray.Add(NSigmaNeg); }
+            catch { }
+
+            chart1.Annotations.Clear();
+            if (specMin != 0) AddAnnotation("SpecMin=" + PptLayer.Format("S4", specMin), specMin, Xlength, System.Drawing.Color.Black);
+            if (specMax != 0) AddAnnotation("SpecMax=" + PptLayer.Format("S4", specMax), specMax, Xlength, System.Drawing.Color.Black);
+            AddAnnotation("Ave=" + PptLayer.Format("S4", Average), Average, Xlength, System.Drawing.Color.LimeGreen);
+            AddAnnotation("Min=" + PptLayer.Format("S4", Min), Min, Xlength, System.Drawing.Color.Violet);
+            AddAnnotation("Max=" + PptLayer.Format("S4", Max), Max, Xlength, System.Drawing.Color.OrangeRed);
+
+            if (NSigmaPos.ToString() != "NaN") AddAnnotation("+" + SummaryMainClass.NSigma.ToString() + "Sigma=" + PptLayer.Format("S4", NSigmaPos), NSigmaPos, Xlength, System.Drawing.Color.Brown);
+            if (NSigmaNeg.ToString() != "NaN" & NSigmaNeg.ToString() != "-Infinity") AddAnnotation("-" + SummaryMainClass.NSigma.ToString() + "Sigma=" + PptLayer.Format("S4", NSigmaNeg), NSigmaNeg, Xlength, System.Drawing.Color.Brown);
+
+            return OutArray.ToArray();
+
+        }
+        public void SaveSummary(string path = "")
+        {
+            PptLayer.ExportSummaryTables(dtSum);
+        }
+        /// <summary>
+        /// Generates the summary and BoxPlot and updates the datagirdview and chart.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="saveFlag"></param>
+        public void GenerateNSaveChart(string path = "", bool saveFlag = true, string Type = "PPT")
+        {
+            //Iterate through remaining fields
+
+            if (saveFlag) toolStripStatusLabel = "Saving the Summary and Plot ...";
+            try
+            {
+                var RowList = sm.pvt._SourceTable.DefaultView.ToTable(true, InputFields1.Iterator).AsEnumerable().ToList();
+                string AdditionalFilter = string.Empty;
+                string AdditionalSpecFilter = string.Empty;
+                //Iterate through the output
+                foreach (string DataOut in InputFields1.Datafield)
+                {
+                    foreach (var RowName in RowList)
+                    {
+                        string strFilter = string.Empty;
+                        string strSpecFilter = string.Empty;
+                        //Iterate through the input
+                        foreach (string Field in InputFields1.Iterator)
+                        {
+                            strFilter += " and " + Field + " = '" + RowName[Field].ToString() + "'";
+                            if (CheckColumnExists(sm.pvt._SpecTable, Field)) strSpecFilter += " and " + Field + " = '" + RowName[Field].ToString() + "'";
+                        }
+                        if (strFilter.Length > 5) AdditionalFilter = strFilter.Substring(5) + " and ";
+                        if (strSpecFilter.Length > 5) AdditionalSpecFilter = strSpecFilter.Substring(5) + " and ";
+                        dtChartSum = sm.pvt.FilteredPivotData(DataOut, InputFields1.Aggregate, InputFields1.PlotRowField, InputFields1.PlotColumnField, InputFields1.NSigma, AdditionalFilter);
+                        SummaryMainClass.RestoreDataTable(ref dtChartSum);
+
+                        BpdataGridView.DataSource = dtChartSum.DefaultView; //Chart Summary
+
+                        DataTable dtbp = sm.pvt.FilteredPivotData(DataOut, new AggregateFunction[] { AggregateFunction.FullArray }, InputFields1.PlotSeries, InputFields1.Plotx, InputFields1.NSigma, AdditionalFilter);
+                        if (InputFields1.Plotx.Length > 0 & InputFields1.Ploty.Length > 0) DtBoxPlot(dtbp, dtSum, InputFields1.Plotx[0], DataOut, AdditionalFilter, AdditionalSpecFilter);
+                        else ClearPlot();
+                        if (!saveFlag) break;
+                        string pathImg = System.IO.Directory.GetCurrentDirectory() + "\\mychart.Tiff";
+                        chart1.SaveImage(pathImg, ChartImageFormat.Tiff);
+                        if (enableChartFlag == true) PptLayer.IncludeImage(pathImg);
+
+                        if (enableChartSumFlag == true) PptLayer.ExportSummaryTables(dtSum);
+                    }
+                    if (sm.errormsg == "") toolStripStatusLabel = "Ready";
+                    if (!saveFlag) break;
+                }
+            }
+            catch (Exception ex)
+            { toolStripStatusLabel = ex.Message; }
+
+
+        }
+        public void GenerateNSaveSummary(string path = "", bool saveFlag = true, string Type = "PPT")
+        {
+            foreach (var eachDatafiled in InputFields1.Datafield)
+            {
+                dtSum = sm.SummaryData(eachDatafiled, InputFields1.SumRowfield, InputFields1.SumColumnfield, InputFields1.Aggregate, InputFields1.NSigma); //InputFields1.Datafield[0]
+                SumdataGridView.DataSource = dtSum.DefaultView;
+                ExportToCsv.ToCsV(SumdataGridView, path, true);
+            }
+        }
+
+        public void AddAnnotation(string AnnotateName, double AnnotateValue, double AnnotateLength, Color color)
+        {
+            Series seriesMax = new Series(AnnotateName);
+            seriesMax.ChartType = SeriesChartType.Line;
+            seriesMax.Points.AddXY(0, AnnotateValue);
+            seriesMax.Points.AddXY(AnnotateLength, AnnotateValue);
+            seriesMax.BorderWidth = 1;
+            //Add annotation
+            TextAnnotation annotation =
+            new TextAnnotation();
+            annotation.Text = AnnotateName;
+            annotation.Font = new System.Drawing.Font("Arial", 8);
+            annotation.ForeColor = System.Drawing.Color.Black;
+            chart1.Annotations.Add(annotation);
+            annotation.AnchorDataPoint = seriesMax.Points[1];
+
+            try
+            {
+                chart1.Series.Add(seriesMax);
+                annotation.ForeColor = color;
+                chart1.Series[chart1.Series.Count - 1].Color = color;
+            }
+            catch { }
+
+        }
+        public bool CheckColumnExists(DataTable dt, string ColName)
+        {
+            if (dt == null) return false;
+            foreach (DataColumn dc in dt.Columns) if (dc.ColumnName == ColName) return true;
+            return false;
+        }
+    }
+    public class InputFields
+    {
+        public string[] SumRowfield;
+        public string[] SumColumnfield;
+        public string[] PlotRowField;
+        public string[] PlotColumnField;
+        public string[] Plotx;
+        public string[] Ploty;
+        public string[] PlotyCombined;
+        public string[] PlotSeries;
+        public string[] Iterator;
+
+        public string[] Datafield;
+        public AggregateFunction[] Aggregate;
+        public double NSigma = 3;
+        //public DataCrunch.DataCrunchClass dc;
+        public Chart chart1;
+        public string toolStripStatusLabel;
+        public string TypicalLotFilter;
+    }
+}
