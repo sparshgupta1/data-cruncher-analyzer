@@ -189,11 +189,12 @@ public class Pivot
                         foreach (string Field
                             in RowFields.Except(Iterator).ToArray())
                         {
-                            tempstrSecondaryFilter = " and " + Field + " = '" + r[Field].ToString() + "'";
+                            tempstrSecondaryFilter += " and " + Field + " = '" + r[Field].ToString() + "'";
                             if (Speccolumns.Contains(Field)) strSpecFilter += " and " + Field + " = '" + r[Field].ToString() + "'";
                         }
                         strSecondaryFilters.Add(strPrimaryFilter + " and " + tempstrSecondaryFilter.Substring(5));
                     }
+                    strSecondaryFilters = strSecondaryFilters.Distinct().ToList<string>();
                     if (strSpecFilter.Length > 5) strSpecFilter = strSpecFilter.Substring(5);
 
                     if (ColumnFields.Length > 0)

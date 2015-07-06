@@ -201,7 +201,7 @@ namespace SummaryToolForm
             //
             SubscribePopups();
             InitializeInputFields();
-            DtPlots1 = new DtPlots(InputFields1, new DataGridView[] { SumdataGridView, FilterdataGridView, BpdataGridView, EditdataGridView }, chart1);
+            DtPlots1 = new DtPlots(InputFields1, new DataGridView[] { SumdataGridView, HighSummaryDataGridView, FilterdataGridView, BpdataGridView, EditdataGridView }, chart1);
         }
         private void SubscribePopups()
         {
@@ -312,7 +312,8 @@ namespace SummaryToolForm
 
             //Get StatisticsDNDLV, StatisticsSelectedDNDLV
             InputFields1.Aggregate = new AggregateFunction[StatisticsSelectedDNDLV.Items.Count];
-            for (int i = 0; i < StatisticsSelectedDNDLV.Items.Count; i++)
+            
+            for (int i = 0; i <= StatisticsSelectedDNDLV.Items.Count-1; i++)
             {
                 if (StatisticsSelectedDNDLV.Items[i].Text == AggregateFunction.Min.ToString()) InputFields1.Aggregate[i] = AggregateFunction.Min;
                 if (StatisticsSelectedDNDLV.Items[i].Text == AggregateFunction.Max.ToString()) InputFields1.Aggregate[i] = AggregateFunction.Max;
@@ -324,8 +325,13 @@ namespace SummaryToolForm
                 if (StatisticsSelectedDNDLV.Items[i].Text == AggregateFunction.SpecMax.ToString()) InputFields1.Aggregate[i] = AggregateFunction.SpecMax;
                 if (StatisticsSelectedDNDLV.Items[i].Text == AggregateFunction.SpecTypical.ToString()) InputFields1.Aggregate[i] = AggregateFunction.SpecTypical;
 
-                if (StatisticsSelectedDNDLV.Items[i].Text == "") InputFields1.Aggregate[i] = AggregateFunction.Max;
+                //if (StatisticsSelectedDNDLV.Items[i].Text == "") InputFields1.Aggregate[i] = AggregateFunction.Max;
             }
+            List<AggregateFunction> lst_agr = InputFields1.Aggregate.ToList<AggregateFunction>();
+            lst_agr.Remove(InputFields1.Aggregate.ToList<AggregateFunction>().Find(y => y.ToString().Equals("0")));
+            InputFields1.Aggregate = lst_agr.ToArray();
+            
+            
             if (StatisticsSelectedDNDLV.Items.Count == 0) { InputFields1.Aggregate = new AggregateFunction[1]; InputFields1.Aggregate[0] = AggregateFunction.Max; }
             toolStripStatusLabel1.Text = "Ready";
             return true;
@@ -2096,7 +2102,7 @@ namespace SummaryToolForm
         public void restoreData()
         {
             InitializeInputFields();
-            DtPlots1 = new DtPlots(InputFields1, new DataGridView[] { SumdataGridView, FilterdataGridView, BpdataGridView, EditdataGridView }, chart1);
+            DtPlots1 = new DtPlots(InputFields1, new DataGridView[] { SumdataGridView, HighSummaryDataGridView, FilterdataGridView, BpdataGridView, EditdataGridView }, chart1);
 
             DtPlots1.summaryInit();
             SummaryPlotInit();

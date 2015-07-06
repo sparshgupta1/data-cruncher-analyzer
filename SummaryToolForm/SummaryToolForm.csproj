@@ -136,7 +136,7 @@
       <Name>FormSerializor</Name>
     </ProjectReference>
     <ProjectReference Include="..\SummaryTool\SummaryTool.csproj">
-      <Project>{88AE67B8-0E4F-4069-9E36-EFBC2B530B28}</Project>
+      <Project>{AD7A4D17-6C49-4076-97E1-F7D793DA56FF}</Project>
       <Name>SummaryTool</Name>
     </ProjectReference>
     <ProjectReference Include="..\Update\Update.csproj">
