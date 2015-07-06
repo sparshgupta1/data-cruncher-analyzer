@@ -15,17 +15,17 @@ using System.IO;
 
 namespace SummaryToolForm
 {
-	/// <summary>
-	/// Summary description for Form3.
-	/// </summary>
-	public class SummaryToolFrm : System.Windows.Forms.Form
-	{
-		private System.Windows.Forms.ColumnHeader columnHeader1;
-		private System.Windows.Forms.ColumnHeader columnHeader2;
-		private System.Windows.Forms.ColumnHeader columnHeader3;
-		private System.Windows.Forms.ColumnHeader columnHeader4;
-		private DragNDrop.DragNDropListView XaxisRowDNDLV;
-		private DragNDrop.DragNDropListView YAxisOutputDNDLV;
+    /// <summary>
+    /// Summary description for Form3.
+    /// </summary>
+    public class SummaryToolFrm : System.Windows.Forms.Form
+    {
+        private System.Windows.Forms.ColumnHeader columnHeader1;
+        private System.Windows.Forms.ColumnHeader columnHeader2;
+        private System.Windows.Forms.ColumnHeader columnHeader3;
+        private System.Windows.Forms.ColumnHeader columnHeader4;
+        private DragNDrop.DragNDropListView XaxisRowDNDLV;
+        private DragNDrop.DragNDropListView YAxisOutputDNDLV;
         private DragNDrop.DragNDropListView InputRowDNDLV;
         private ColumnHeader columnHeader5;
         private ColumnHeader columnHeader6;
@@ -74,7 +74,7 @@ namespace SummaryToolForm
         private ToolStripMenuItem disableSummaryToolStripMenuItem;
         private ToolStripMenuItem disableChartToolStripMenuItem;
         private ToolStripMenuItem disableChartSummaryToolStripMenuItem;
-        
+
         public DataTable dtSum;
         public SummaryMainClass sm;
         public string[] Rowfield;
@@ -156,33 +156,34 @@ namespace SummaryToolForm
         public InputFields InputFields1 = new InputFields();
         private SplitContainer splitContainer14;
         private DataGridView HighSummaryDataGridView;
+        private ToolStripMenuItem highLevelSummaryToolStripMenuItem;
 
         PopupForm PopupForm1 = new PopupForm();
 
-		public SummaryToolFrm()
-		{
-			//
-			// Required for Windows Form Designer support
-			//
-			InitializeComponent();
+        public SummaryToolFrm()
+        {
+            //
+            // Required for Windows Form Designer support
+            //
+            InitializeComponent();
 
             //
-			// TODO: Add any constructor code after InitializeComponent call
-			//
-            
+            // TODO: Add any constructor code after InitializeComponent call
+            //
+
             SubscribePopups();
             InitializeInputFields();
-            DtPlots1 = new DtPlots(InputFields1, new DataGridView[] { SumdataGridView,HighSummaryDataGridView,FilterdataGridView,BpdataGridView,EditdataGridView }, chart1);
+            DtPlots1 = new DtPlots(InputFields1, new DataGridView[] { SumdataGridView, HighSummaryDataGridView, FilterdataGridView, BpdataGridView, EditdataGridView }, chart1);
 
             DtPlots1.summaryInit();
             FormSerializor.FormSerilizor.DeSerialise(this);
 
             //Check the minimum inputs needed to plot/summary 
-            if (InputRowDNDLV.Items.Count == 0 & AllEntryDNDLV.Items.Count == 0 & XaxisRowDNDLV.Items.Count == 0 & YAxisOutputDNDLV.Items.Count == 0 & InputRowDNDLV.Items.Count == 0 & 
+            if (InputRowDNDLV.Items.Count == 0 & AllEntryDNDLV.Items.Count == 0 & XaxisRowDNDLV.Items.Count == 0 & YAxisOutputDNDLV.Items.Count == 0 & InputRowDNDLV.Items.Count == 0 &
                  InputColumnDNDLV.Items.Count == 0 & YAxisOutputDNDLV.Items.Count == 0 & YAxisCombinedOutputDNDLV.Items.Count == 0 & XaxisColumnDNDLV.Items.Count == 0)
-             {
-                 SummaryPlotInit();
-             }
+            {
+                SummaryPlotInit();
+            }
 
             AdminForminit();
             try
@@ -312,8 +313,8 @@ namespace SummaryToolForm
 
             //Get StatisticsDNDLV, StatisticsSelectedDNDLV
             InputFields1.Aggregate = new AggregateFunction[StatisticsSelectedDNDLV.Items.Count];
-            
-            for (int i = 0; i <= StatisticsSelectedDNDLV.Items.Count-1; i++)
+
+            for (int i = 0; i <= StatisticsSelectedDNDLV.Items.Count - 1; i++)
             {
                 if (StatisticsSelectedDNDLV.Items[i].Text == AggregateFunction.Min.ToString()) InputFields1.Aggregate[i] = AggregateFunction.Min;
                 if (StatisticsSelectedDNDLV.Items[i].Text == AggregateFunction.Max.ToString()) InputFields1.Aggregate[i] = AggregateFunction.Max;
@@ -330,8 +331,8 @@ namespace SummaryToolForm
             List<AggregateFunction> lst_agr = InputFields1.Aggregate.ToList<AggregateFunction>();
             lst_agr.Remove(InputFields1.Aggregate.ToList<AggregateFunction>().Find(y => y.ToString().Equals("0")));
             InputFields1.Aggregate = lst_agr.ToArray();
-            
-            
+
+
             if (StatisticsSelectedDNDLV.Items.Count == 0) { InputFields1.Aggregate = new AggregateFunction[1]; InputFields1.Aggregate[0] = AggregateFunction.Max; }
             toolStripStatusLabel1.Text = "Ready";
             return true;
@@ -349,28 +350,28 @@ namespace SummaryToolForm
                 releaseProductionToolStripMenuItem.Visible = true;
             }
         }
-		/// <summary>
-		/// Clean up any resources being used.
-		/// </summary>
-		protected override void Dispose( bool disposing )
-		{
-			if( disposing )
-			{
-				if (components != null) 
-				{
-					components.Dispose();
-				}
-			}
-			base.Dispose( disposing );
-		}
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (components != null)
+                {
+                    components.Dispose();
+                }
+            }
+            base.Dispose(disposing);
+        }
 
-		#region Windows Form Designer generated code
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{
+        #region Windows Form Designer generated code
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
@@ -389,6 +390,9 @@ namespace SummaryToolForm
             System.Windows.Forms.ListViewItem listViewItem8 = new System.Windows.Forms.ListViewItem("SpecMin");
             System.Windows.Forms.ListViewItem listViewItem9 = new System.Windows.Forms.ListViewItem("SpecMax");
             System.Windows.Forms.ListViewItem listViewItem10 = new System.Windows.Forms.ListViewItem("SpecTypical");
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
@@ -399,21 +403,6 @@ namespace SummaryToolForm
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SummaryToolFrm));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
-            this.XaxisRowDNDLV = new DragNDrop.DragNDropListView();
-            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.YAxisOutputDNDLV = new DragNDrop.DragNDropListView();
-            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.InputRowDNDLV = new DragNDrop.DragNDropListView();
-            this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.AllEntryDNDLV = new DragNDrop.DragNDropListView();
-            this.columnHeader7 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader8 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SumdataGridView = new System.Windows.Forms.DataGridView();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.menuToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -425,6 +414,7 @@ namespace SummaryToolForm
             this.table2ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.chartSummaryToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.specificationNToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.highLevelSummaryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportSummaryToPPTToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.chartSummaryPCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.summaryPSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -449,6 +439,9 @@ namespace SummaryToolForm
             this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
+            this.AllEntryDNDLV = new DragNDrop.DragNDropListView();
+            this.columnHeader7 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader8 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.splitContainer4 = new System.Windows.Forms.SplitContainer();
             this.splitContainer5 = new System.Windows.Forms.SplitContainer();
             this.label5 = new System.Windows.Forms.Label();
@@ -464,6 +457,9 @@ namespace SummaryToolForm
             this.statisticsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer11 = new System.Windows.Forms.SplitContainer();
             this.splitContainer12 = new System.Windows.Forms.SplitContainer();
+            this.XaxisRowDNDLV = new DragNDrop.DragNDropListView();
+            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.menuStrip12 = new System.Windows.Forms.MenuStrip();
             this.xAxisRowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.XaxisColumnDNDLV = new DragNDrop.DragNDropListView();
@@ -484,6 +480,9 @@ namespace SummaryToolForm
             this.chartSeriesColumnToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer6 = new System.Windows.Forms.SplitContainer();
             this.splitContainer9 = new System.Windows.Forms.SplitContainer();
+            this.InputRowDNDLV = new DragNDrop.DragNDropListView();
+            this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.menuStrip6 = new System.Windows.Forms.MenuStrip();
             this.inputRowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.InputColumnDNDLV = new DragNDrop.DragNDropListView();
@@ -492,6 +491,9 @@ namespace SummaryToolForm
             this.menuStrip10 = new System.Windows.Forms.MenuStrip();
             this.inputColumnToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer10 = new System.Windows.Forms.SplitContainer();
+            this.YAxisOutputDNDLV = new DragNDrop.DragNDropListView();
+            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.menuStrip5 = new System.Windows.Forms.MenuStrip();
             this.yAxisToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.YAxisCombinedOutputDNDLV = new DragNDrop.DragNDropListView();
@@ -501,6 +503,8 @@ namespace SummaryToolForm
             this.multiOutputToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.splitContainer8 = new System.Windows.Forms.SplitContainer();
+            this.splitContainer14 = new System.Windows.Forms.SplitContainer();
+            this.HighSummaryDataGridView = new System.Windows.Forms.DataGridView();
             this.menuStrip2 = new System.Windows.Forms.MenuStrip();
             this.summaryTableToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.disableSummaryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -521,8 +525,6 @@ namespace SummaryToolForm
             this.tabPageEdit = new System.Windows.Forms.TabPage();
             this.EditdataGridView = new System.Windows.Forms.DataGridView();
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
-            this.splitContainer14 = new System.Windows.Forms.SplitContainer();
-            this.HighSummaryDataGridView = new System.Windows.Forms.DataGridView();
             ((System.ComponentModel.ISupportInitialize)(this.SumdataGridView)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -584,6 +586,11 @@ namespace SummaryToolForm
             this.splitContainer8.Panel1.SuspendLayout();
             this.splitContainer8.Panel2.SuspendLayout();
             this.splitContainer8.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer14)).BeginInit();
+            this.splitContainer14.Panel1.SuspendLayout();
+            this.splitContainer14.Panel2.SuspendLayout();
+            this.splitContainer14.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.HighSummaryDataGridView)).BeginInit();
             this.menuStrip2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.FilterdataGridView)).BeginInit();
             this.menuStrip3.SuspendLayout();
@@ -597,119 +604,7 @@ namespace SummaryToolForm
             this.tabPageSummaryTool.SuspendLayout();
             this.tabPageEdit.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.EditdataGridView)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer14)).BeginInit();
-            this.splitContainer14.Panel1.SuspendLayout();
-            this.splitContainer14.Panel2.SuspendLayout();
-            this.splitContainer14.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.HighSummaryDataGridView)).BeginInit();
             this.SuspendLayout();
-            // 
-            // XaxisRowDNDLV
-            // 
-            this.XaxisRowDNDLV.AllowDrop = true;
-            this.XaxisRowDNDLV.AllowReorder = true;
-            this.XaxisRowDNDLV.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader1,
-            this.columnHeader2});
-            this.XaxisRowDNDLV.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.XaxisRowDNDLV.FullRowSelect = true;
-            this.XaxisRowDNDLV.LineColor = System.Drawing.Color.Olive;
-            this.XaxisRowDNDLV.Location = new System.Drawing.Point(0, 24);
-            this.XaxisRowDNDLV.Name = "XaxisRowDNDLV";
-            this.XaxisRowDNDLV.Size = new System.Drawing.Size(88, 85);
-            this.XaxisRowDNDLV.TabIndex = 0;
-            this.XaxisRowDNDLV.UseCompatibleStateImageBehavior = false;
-            this.XaxisRowDNDLV.View = System.Windows.Forms.View.List;
-            this.XaxisRowDNDLV.DragDrop += new System.Windows.Forms.DragEventHandler(this.XaxisRowDNDLV_DragDrop);
-            this.XaxisRowDNDLV.MouseClick += new System.Windows.Forms.MouseEventHandler(this.XaxisRowDNDLV_MouseClick);
-            // 
-            // columnHeader1
-            // 
-            this.columnHeader1.Width = 190;
-            // 
-            // columnHeader2
-            // 
-            this.columnHeader2.Width = 244;
-            // 
-            // YAxisOutputDNDLV
-            // 
-            this.YAxisOutputDNDLV.AllowDrop = true;
-            this.YAxisOutputDNDLV.AllowReorder = true;
-            this.YAxisOutputDNDLV.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader3,
-            this.columnHeader4});
-            this.YAxisOutputDNDLV.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.YAxisOutputDNDLV.FullRowSelect = true;
-            this.YAxisOutputDNDLV.LineColor = System.Drawing.Color.Olive;
-            this.YAxisOutputDNDLV.Location = new System.Drawing.Point(0, 24);
-            this.YAxisOutputDNDLV.Name = "YAxisOutputDNDLV";
-            this.YAxisOutputDNDLV.Size = new System.Drawing.Size(234, 48);
-            this.YAxisOutputDNDLV.TabIndex = 1;
-            this.YAxisOutputDNDLV.UseCompatibleStateImageBehavior = false;
-            this.YAxisOutputDNDLV.View = System.Windows.Forms.View.List;
-            this.YAxisOutputDNDLV.DragDrop += new System.Windows.Forms.DragEventHandler(this.YAxisOutputDNDLV_DragDrop_1);
-            // 
-            // columnHeader3
-            // 
-            this.columnHeader3.Width = 190;
-            // 
-            // columnHeader4
-            // 
-            this.columnHeader4.Width = 244;
-            // 
-            // InputRowDNDLV
-            // 
-            this.InputRowDNDLV.AllowDrop = true;
-            this.InputRowDNDLV.AllowReorder = true;
-            this.InputRowDNDLV.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader5,
-            this.columnHeader6});
-            this.InputRowDNDLV.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.InputRowDNDLV.FullRowSelect = true;
-            this.InputRowDNDLV.LineColor = System.Drawing.Color.Olive;
-            this.InputRowDNDLV.Location = new System.Drawing.Point(0, 24);
-            this.InputRowDNDLV.Name = "InputRowDNDLV";
-            this.InputRowDNDLV.Size = new System.Drawing.Size(177, 48);
-            this.InputRowDNDLV.TabIndex = 1;
-            this.InputRowDNDLV.UseCompatibleStateImageBehavior = false;
-            this.InputRowDNDLV.View = System.Windows.Forms.View.List;
-            this.InputRowDNDLV.DragDrop += new System.Windows.Forms.DragEventHandler(this.InputRowDNDLV_DragDrop);
-            this.InputRowDNDLV.MouseClick += new System.Windows.Forms.MouseEventHandler(this.InputRowDNDLV_MouseClick);
-            // 
-            // columnHeader5
-            // 
-            this.columnHeader5.Width = 190;
-            // 
-            // columnHeader6
-            // 
-            this.columnHeader6.Width = 244;
-            // 
-            // AllEntryDNDLV
-            // 
-            this.AllEntryDNDLV.AllowDrop = true;
-            this.AllEntryDNDLV.AllowReorder = true;
-            this.AllEntryDNDLV.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader7,
-            this.columnHeader8});
-            this.AllEntryDNDLV.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AllEntryDNDLV.FullRowSelect = true;
-            this.AllEntryDNDLV.LineColor = System.Drawing.Color.Olive;
-            this.AllEntryDNDLV.Location = new System.Drawing.Point(0, 0);
-            this.AllEntryDNDLV.Name = "AllEntryDNDLV";
-            this.AllEntryDNDLV.Size = new System.Drawing.Size(385, 185);
-            this.AllEntryDNDLV.TabIndex = 1;
-            this.AllEntryDNDLV.UseCompatibleStateImageBehavior = false;
-            this.AllEntryDNDLV.View = System.Windows.Forms.View.List;
-            this.AllEntryDNDLV.DragDrop += new System.Windows.Forms.DragEventHandler(this.AllEntryDNDLV_DragDrop);
-            this.AllEntryDNDLV.MouseClick += new System.Windows.Forms.MouseEventHandler(this.AllEntryDNDLV_MouseClick);
-            // 
-            // columnHeader7
-            // 
-            this.columnHeader7.Width = 190;
-            // 
-            // columnHeader8
-            // 
-            this.columnHeader8.Width = 244;
             // 
             // SumdataGridView
             // 
@@ -806,6 +701,7 @@ namespace SummaryToolForm
             // 
             this.exportToCSVToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.table1ToolStripMenuItem,
+            this.highLevelSummaryToolStripMenuItem,
             this.table2ToolStripMenuItem,
             this.chartSummaryToolStripMenuItem1,
             this.specificationNToolStripMenuItem});
@@ -816,29 +712,36 @@ namespace SummaryToolForm
             // table1ToolStripMenuItem
             // 
             this.table1ToolStripMenuItem.Name = "table1ToolStripMenuItem";
-            this.table1ToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
-            this.table1ToolStripMenuItem.Text = "S&ummary                U";
+            this.table1ToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.table1ToolStripMenuItem.Text = "S&ummary                       U";
             this.table1ToolStripMenuItem.Click += new System.EventHandler(this.table1ToolStripMenuItem_Click);
             // 
             // table2ToolStripMenuItem
             // 
             this.table2ToolStripMenuItem.Name = "table2ToolStripMenuItem";
-            this.table2ToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
-            this.table2ToolStripMenuItem.Text = "&Filtered Data           F";
+            this.table2ToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.table2ToolStripMenuItem.Text = "&Filtered Data                  F";
             this.table2ToolStripMenuItem.Click += new System.EventHandler(this.table2ToolStripMenuItem_Click);
             // 
             // chartSummaryToolStripMenuItem1
             // 
             this.chartSummaryToolStripMenuItem1.Name = "chartSummaryToolStripMenuItem1";
-            this.chartSummaryToolStripMenuItem1.Size = new System.Drawing.Size(181, 22);
-            this.chartSummaryToolStripMenuItem1.Text = "&Chart Summary     C";
+            this.chartSummaryToolStripMenuItem1.Size = new System.Drawing.Size(202, 22);
+            this.chartSummaryToolStripMenuItem1.Text = "&Chart Summary            C";
             this.chartSummaryToolStripMenuItem1.Click += new System.EventHandler(this.chartSummaryToolStripMenuItem1_Click);
             // 
             // specificationNToolStripMenuItem
             // 
             this.specificationNToolStripMenuItem.Name = "specificationNToolStripMenuItem";
-            this.specificationNToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
-            this.specificationNToolStripMenuItem.Text = "Specification          N";
+            this.specificationNToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.specificationNToolStripMenuItem.Text = "Specification                 N";
+            // 
+            // highLevelSummaryToolStripMenuItem
+            // 
+            this.highLevelSummaryToolStripMenuItem.Name = "highLevelSummaryToolStripMenuItem";
+            this.highLevelSummaryToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.highLevelSummaryToolStripMenuItem.Text = "&HighLevel Summary    H";
+            this.highLevelSummaryToolStripMenuItem.Click += new System.EventHandler(this.highLevelSummaryToolStripMenuItem_Click);
             // 
             // exportSummaryToPPTToolStripMenuItem
             // 
@@ -1046,6 +949,33 @@ namespace SummaryToolForm
             this.splitContainer3.SplitterDistance = 385;
             this.splitContainer3.TabIndex = 2;
             // 
+            // AllEntryDNDLV
+            // 
+            this.AllEntryDNDLV.AllowDrop = true;
+            this.AllEntryDNDLV.AllowReorder = true;
+            this.AllEntryDNDLV.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader7,
+            this.columnHeader8});
+            this.AllEntryDNDLV.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.AllEntryDNDLV.FullRowSelect = true;
+            this.AllEntryDNDLV.LineColor = System.Drawing.Color.Olive;
+            this.AllEntryDNDLV.Location = new System.Drawing.Point(0, 0);
+            this.AllEntryDNDLV.Name = "AllEntryDNDLV";
+            this.AllEntryDNDLV.Size = new System.Drawing.Size(385, 185);
+            this.AllEntryDNDLV.TabIndex = 1;
+            this.AllEntryDNDLV.UseCompatibleStateImageBehavior = false;
+            this.AllEntryDNDLV.View = System.Windows.Forms.View.List;
+            this.AllEntryDNDLV.DragDrop += new System.Windows.Forms.DragEventHandler(this.AllEntryDNDLV_DragDrop);
+            this.AllEntryDNDLV.MouseClick += new System.Windows.Forms.MouseEventHandler(this.AllEntryDNDLV_MouseClick);
+            // 
+            // columnHeader7
+            // 
+            this.columnHeader7.Width = 190;
+            // 
+            // columnHeader8
+            // 
+            this.columnHeader8.Width = 244;
+            // 
             // splitContainer4
             // 
             this.splitContainer4.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -1226,6 +1156,33 @@ namespace SummaryToolForm
             this.splitContainer12.Size = new System.Drawing.Size(191, 109);
             this.splitContainer12.SplitterDistance = 88;
             this.splitContainer12.TabIndex = 2;
+            // 
+            // XaxisRowDNDLV
+            // 
+            this.XaxisRowDNDLV.AllowDrop = true;
+            this.XaxisRowDNDLV.AllowReorder = true;
+            this.XaxisRowDNDLV.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader1,
+            this.columnHeader2});
+            this.XaxisRowDNDLV.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.XaxisRowDNDLV.FullRowSelect = true;
+            this.XaxisRowDNDLV.LineColor = System.Drawing.Color.Olive;
+            this.XaxisRowDNDLV.Location = new System.Drawing.Point(0, 24);
+            this.XaxisRowDNDLV.Name = "XaxisRowDNDLV";
+            this.XaxisRowDNDLV.Size = new System.Drawing.Size(88, 85);
+            this.XaxisRowDNDLV.TabIndex = 0;
+            this.XaxisRowDNDLV.UseCompatibleStateImageBehavior = false;
+            this.XaxisRowDNDLV.View = System.Windows.Forms.View.List;
+            this.XaxisRowDNDLV.DragDrop += new System.Windows.Forms.DragEventHandler(this.XaxisRowDNDLV_DragDrop);
+            this.XaxisRowDNDLV.MouseClick += new System.Windows.Forms.MouseEventHandler(this.XaxisRowDNDLV_MouseClick);
+            // 
+            // columnHeader1
+            // 
+            this.columnHeader1.Width = 190;
+            // 
+            // columnHeader2
+            // 
+            this.columnHeader2.Width = 244;
             // 
             // menuStrip12
             // 
@@ -1435,6 +1392,33 @@ namespace SummaryToolForm
             this.splitContainer9.SplitterDistance = 177;
             this.splitContainer9.TabIndex = 3;
             // 
+            // InputRowDNDLV
+            // 
+            this.InputRowDNDLV.AllowDrop = true;
+            this.InputRowDNDLV.AllowReorder = true;
+            this.InputRowDNDLV.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader5,
+            this.columnHeader6});
+            this.InputRowDNDLV.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.InputRowDNDLV.FullRowSelect = true;
+            this.InputRowDNDLV.LineColor = System.Drawing.Color.Olive;
+            this.InputRowDNDLV.Location = new System.Drawing.Point(0, 24);
+            this.InputRowDNDLV.Name = "InputRowDNDLV";
+            this.InputRowDNDLV.Size = new System.Drawing.Size(177, 48);
+            this.InputRowDNDLV.TabIndex = 1;
+            this.InputRowDNDLV.UseCompatibleStateImageBehavior = false;
+            this.InputRowDNDLV.View = System.Windows.Forms.View.List;
+            this.InputRowDNDLV.DragDrop += new System.Windows.Forms.DragEventHandler(this.InputRowDNDLV_DragDrop);
+            this.InputRowDNDLV.MouseClick += new System.Windows.Forms.MouseEventHandler(this.InputRowDNDLV_MouseClick);
+            // 
+            // columnHeader5
+            // 
+            this.columnHeader5.Width = 190;
+            // 
+            // columnHeader6
+            // 
+            this.columnHeader6.Width = 244;
+            // 
             // menuStrip6
             // 
             this.menuStrip6.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -1518,6 +1502,32 @@ namespace SummaryToolForm
             this.splitContainer10.Size = new System.Drawing.Size(496, 72);
             this.splitContainer10.SplitterDistance = 234;
             this.splitContainer10.TabIndex = 2;
+            // 
+            // YAxisOutputDNDLV
+            // 
+            this.YAxisOutputDNDLV.AllowDrop = true;
+            this.YAxisOutputDNDLV.AllowReorder = true;
+            this.YAxisOutputDNDLV.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader3,
+            this.columnHeader4});
+            this.YAxisOutputDNDLV.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.YAxisOutputDNDLV.FullRowSelect = true;
+            this.YAxisOutputDNDLV.LineColor = System.Drawing.Color.Olive;
+            this.YAxisOutputDNDLV.Location = new System.Drawing.Point(0, 24);
+            this.YAxisOutputDNDLV.Name = "YAxisOutputDNDLV";
+            this.YAxisOutputDNDLV.Size = new System.Drawing.Size(234, 48);
+            this.YAxisOutputDNDLV.TabIndex = 1;
+            this.YAxisOutputDNDLV.UseCompatibleStateImageBehavior = false;
+            this.YAxisOutputDNDLV.View = System.Windows.Forms.View.List;
+            this.YAxisOutputDNDLV.DragDrop += new System.Windows.Forms.DragEventHandler(this.YAxisOutputDNDLV_DragDrop_1);
+            // 
+            // columnHeader3
+            // 
+            this.columnHeader3.Width = 190;
+            // 
+            // columnHeader4
+            // 
+            this.columnHeader4.Width = 244;
             // 
             // menuStrip5
             // 
@@ -1616,6 +1626,57 @@ namespace SummaryToolForm
             this.splitContainer8.Size = new System.Drawing.Size(1262, 196);
             this.splitContainer8.SplitterDistance = 805;
             this.splitContainer8.TabIndex = 3;
+            // 
+            // splitContainer14
+            // 
+            this.splitContainer14.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer14.Location = new System.Drawing.Point(0, 24);
+            this.splitContainer14.Name = "splitContainer14";
+            this.splitContainer14.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // splitContainer14.Panel1
+            // 
+            this.splitContainer14.Panel1.Controls.Add(this.SumdataGridView);
+            // 
+            // splitContainer14.Panel2
+            // 
+            this.splitContainer14.Panel2.Controls.Add(this.HighSummaryDataGridView);
+            this.splitContainer14.Size = new System.Drawing.Size(805, 172);
+            this.splitContainer14.SplitterDistance = 127;
+            this.splitContainer14.TabIndex = 4;
+            // 
+            // HighSummaryDataGridView
+            // 
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.HighSummaryDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
+            this.HighSummaryDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.HighSummaryDataGridView.DefaultCellStyle = dataGridViewCellStyle5;
+            this.HighSummaryDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.HighSummaryDataGridView.Location = new System.Drawing.Point(0, 0);
+            this.HighSummaryDataGridView.Name = "HighSummaryDataGridView";
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.HighSummaryDataGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
+            this.HighSummaryDataGridView.Size = new System.Drawing.Size(805, 41);
+            this.HighSummaryDataGridView.TabIndex = 3;
             // 
             // menuStrip2
             // 
@@ -1878,57 +1939,6 @@ namespace SummaryToolForm
             this.notifyIcon1.Visible = true;
             this.notifyIcon1.Click += new System.EventHandler(this.notifyIcon1_Click);
             // 
-            // splitContainer14
-            // 
-            this.splitContainer14.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer14.Location = new System.Drawing.Point(0, 24);
-            this.splitContainer14.Name = "splitContainer14";
-            this.splitContainer14.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            // 
-            // splitContainer14.Panel1
-            // 
-            this.splitContainer14.Panel1.Controls.Add(this.SumdataGridView);
-            // 
-            // splitContainer14.Panel2
-            // 
-            this.splitContainer14.Panel2.Controls.Add(this.HighSummaryDataGridView);
-            this.splitContainer14.Size = new System.Drawing.Size(805, 172);
-            this.splitContainer14.SplitterDistance = 127;
-            this.splitContainer14.TabIndex = 4;
-            // 
-            // HighSummaryDataGridView
-            // 
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.HighSummaryDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
-            this.HighSummaryDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.HighSummaryDataGridView.DefaultCellStyle = dataGridViewCellStyle5;
-            this.HighSummaryDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.HighSummaryDataGridView.Location = new System.Drawing.Point(0, 0);
-            this.HighSummaryDataGridView.Name = "HighSummaryDataGridView";
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.HighSummaryDataGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
-            this.HighSummaryDataGridView.Size = new System.Drawing.Size(805, 41);
-            this.HighSummaryDataGridView.TabIndex = 3;
-            // 
             // SummaryToolFrm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -2027,6 +2037,11 @@ namespace SummaryToolForm
             this.splitContainer8.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer8)).EndInit();
             this.splitContainer8.ResumeLayout(false);
+            this.splitContainer14.Panel1.ResumeLayout(false);
+            this.splitContainer14.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer14)).EndInit();
+            this.splitContainer14.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.HighSummaryDataGridView)).EndInit();
             this.menuStrip2.ResumeLayout(false);
             this.menuStrip2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.FilterdataGridView)).EndInit();
@@ -2045,16 +2060,11 @@ namespace SummaryToolForm
             this.tabPageSummaryTool.ResumeLayout(false);
             this.tabPageEdit.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.EditdataGridView)).EndInit();
-            this.splitContainer14.Panel1.ResumeLayout(false);
-            this.splitContainer14.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer14)).EndInit();
-            this.splitContainer14.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.HighSummaryDataGridView)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
-		}
-		#endregion
+        }
+        #endregion
 
         private void selectInputsToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -2128,13 +2138,13 @@ namespace SummaryToolForm
             PptLayer.SavePresentation(path);
             MessageBox.Show("Report generation Completed !!!");
         }
-        
+
         private void SumdataGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             toolStripStatusLabel1.Text = "Retriving the data...";
             statusStrip1.Refresh();
             this.Refresh();
-            if(e.RowIndex != -1 & e.ColumnIndex != -1) DtPlots1.refreshDgv(2,e);
+            if (e.RowIndex != -1 & e.ColumnIndex != -1) DtPlots1.refreshDgv(2, e);
             toolStripStatusLabel1.Text = "Ready";
         }
 
@@ -2147,9 +2157,9 @@ namespace SummaryToolForm
 
                 File.Delete(path);
             }
-            DtPlots1.GenerateNSaveSummary(path,true,"CSV");
+            DtPlots1.GenerateNSaveSummary(path, true, "CSV");
         }
-        
+
         private bool IsFileinUse(string filename)
         {
             FileInfo file = new FileInfo(filename);
@@ -2183,18 +2193,23 @@ namespace SummaryToolForm
         {
             ExportToCsv.ToCsV(BpdataGridView, System.IO.Path.Combine(System.IO.Path.GetDirectoryName(DtPlots1.sm.inputSetting.DataPath), System.IO.Path.GetFileNameWithoutExtension(DtPlots1.sm.inputSetting.DataPath) + "_ChartSummary.csv"));
         }
+        private void highLevelSummaryToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ExportToCsv.ToCsV(HighSummaryDataGridView
+                , System.IO.Path.Combine(System.IO.Path.GetDirectoryName(DtPlots1.sm.inputSetting.DataPath), System.IO.Path.GetFileNameWithoutExtension(DtPlots1.sm.inputSetting.DataPath) + "_HighLevelSummary.csv"));
+        }
 
         public void chart1_Customize(object sender, EventArgs e)
         {
             DtPlots1.ChartRedraw();
             if (DtPlots1.toolStripStatusLabel == null && toolStripStatusLabel1.Text == "") toolStripStatusLabel1.Text = "Ready";
         }
-  
+
         private void chart1_PostPaint(object sender, ChartPaintEventArgs e)
         {
             if (e.ChartElement is Chart)
             {
-               // PostPaint(e);
+                // PostPaint(e);
             }
         }
         public void PostPaint(ChartPaintEventArgs e)
@@ -2239,7 +2254,7 @@ namespace SummaryToolForm
             DtPlots1.CreateSpec();
             saveSpec();
             toolStripStatusLabel1.Text = DtPlots1.toolStripStatusLabel;
-            if (DtPlots1.toolStripStatusLabel == null)  toolStripStatusLabel1.Text = "Spec created, saved in data folder.";
+            if (DtPlots1.toolStripStatusLabel == null) toolStripStatusLabel1.Text = "Spec created, saved in data folder.";
         }
         public void saveSpec()
         {
@@ -2248,7 +2263,7 @@ namespace SummaryToolForm
 
         private void NSigmatextBox_TextChanged(object sender, EventArgs e)
         {
-           Double.TryParse(NSigmatextBox.Text, out DtPlots1.InputFields1.NSigma);
+            Double.TryParse(NSigmatextBox.Text, out DtPlots1.InputFields1.NSigma);
             refreshDgv();
         }
 
@@ -2264,10 +2279,10 @@ namespace SummaryToolForm
         private Keys prevKey;
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            if (prevKey == Keys.D && keyData == Keys.S) {disableSummary();return true;}
-            if (prevKey == Keys.D && keyData == Keys.C) {disableChart();return true;}
-            if (prevKey == Keys.D && keyData == Keys.U) {disableChartSummary(); return true;}
-            if (prevKey == Keys.D && keyData == Keys.I) {disableInputSection();return true;}
+            if (prevKey == Keys.D && keyData == Keys.S) { disableSummary(); return true; }
+            if (prevKey == Keys.D && keyData == Keys.C) { disableChart(); return true; }
+            if (prevKey == Keys.D && keyData == Keys.U) { disableChartSummary(); return true; }
+            if (prevKey == Keys.D && keyData == Keys.I) { disableInputSection(); return true; }
             if (keyData == Keys.F5) refreshDgv();
             if (keyData == Keys.I) { DtPlots1.sm.showInput(); SummaryPlotInit(); }
             if (keyData == Keys.R) restoreData();
@@ -2289,7 +2304,7 @@ namespace SummaryToolForm
 
         private void AdminMode_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show("Do you want to enable to Admin mode?","Change to Admin Mode",MessageBoxButtons.YesNo) == DialogResult.Yes)
+            if (MessageBox.Show("Do you want to enable to Admin mode?", "Change to Admin Mode", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 releaseToQAToolStripMenuItem.Visible = true;
                 releaseProductionToolStripMenuItem.Visible = true;
@@ -2365,7 +2380,7 @@ namespace SummaryToolForm
             else
             {//Disable chart
                 DtPlots1.enableChartFlag = false;
-                disableChartDCToolStripMenuItem.Text = "Enable Chart                DC"; 
+                disableChartDCToolStripMenuItem.Text = "Enable Chart                DC";
                 disableChartToolStripMenuItem.Text = "Enable Chart";
                 splitContainer7.Panel2Collapsed = true; splitContainer7.Panel2.Hide();
                 if (disableChartSummaryToolStripMenuItem.Text == "Enable Chart Summary")
@@ -2400,12 +2415,12 @@ namespace SummaryToolForm
 
                 splitContainer1.Visible = true;
                 splitContainer2.Visible = true;
-                splitContainer7.Visible = true; 
+                splitContainer7.Visible = true;
                 splitContainer1.Panel2Collapsed = false; splitContainer1.Panel2.Show();
                 splitContainer2.Panel2Collapsed = false; splitContainer2.Panel2.Show();
                 splitContainer7.Panel1Collapsed = false; splitContainer7.Panel1.Show();
                 disableChartSummaryDUToolStripMenuItem.Text = "Disable Chart Summary       DU";
-                disableChartSummaryToolStripMenuItem.Text =   "Disable Chart Summary"; return;
+                disableChartSummaryToolStripMenuItem.Text = "Disable Chart Summary"; return;
             }
             else
             {//disable chart summary
@@ -2417,7 +2432,7 @@ namespace SummaryToolForm
                 if (disableChartToolStripMenuItem.Text == "Enable Chart")
                 {//close the container as chart is also closed
                     splitContainer7.Visible = false;
-                    splitContainer2.Panel2Collapsed = true;splitContainer2.Panel2.Hide();
+                    splitContainer2.Panel2Collapsed = true; splitContainer2.Panel2.Hide();
                     if (disableSummaryToolStripMenuItem.Text == "Enable Summary")
                     {//close the container as Summary is also closed
                         splitContainer2.Visible = false;
@@ -2482,8 +2497,8 @@ namespace SummaryToolForm
         private void chartSummaryPCToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (disableChartToolStripMenuItem.Text == "Disable Chart") export2PPT("CHART");
-            if (disableChartToolStripMenuItem.Text == "Disable Chart Summary") export2PPT("SUMMARY"); 
-                toolStripStatusLabel1.Text = DtPlots1.toolStripStatusLabel;
+            if (disableChartToolStripMenuItem.Text == "Disable Chart Summary") export2PPT("SUMMARY");
+            toolStripStatusLabel1.Text = DtPlots1.toolStripStatusLabel;
         }
 
         /// <summary>
@@ -2510,7 +2525,7 @@ namespace SummaryToolForm
         {
             Version v = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
             string About = string.Format(System.Globalization.CultureInfo.InvariantCulture, @"YourApp Version {0}.{1}.{2} (r{3})", v.Major, v.Minor, v.Build, v.Revision);
-            
+
             var entryAssembly = System.Reflection.Assembly.GetEntryAssembly();
             var fileInfo = new FileInfo(entryAssembly.Location);
             var buildDate = fileInfo.LastWriteTime;
@@ -2577,7 +2592,7 @@ namespace SummaryToolForm
         {
             refreshDgv();
         }
-        private void showPopup(object sender, MouseEventArgs e )
+        private void showPopup(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
             {
@@ -2643,5 +2658,6 @@ namespace SummaryToolForm
             showPopup(sender, e);
             refreshDgv();
         }
-	}
+
+    }
 }
