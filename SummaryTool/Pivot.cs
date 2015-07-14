@@ -229,7 +229,7 @@ public class Pivot
                         foreach (var fun in Aggregate)
                         {
                             string filter = string.Empty;
-                            if (fun != AggregateFunction.NSigmaNegMin && fun != AggregateFunction.NSigmaPosMax && fun != AggregateFunction.NSigmaNegCorrespondingStdDev && fun != AggregateFunction.NSigmaPosCorrespondingStdDev)
+                            if (fun != AggregateFunction.NSigmaNegMin && fun != AggregateFunction.NSigmaPosMax && fun != AggregateFunction.NSigmaNegCorrespondingStdDev && fun != AggregateFunction.NSigmaPosCorrespondingStdDev && fun != AggregateFunction.NSigmaPosCorrespondingAvg && fun != AggregateFunction.NSigmaNegCorrespondingAvg)
                             {
                                 filter = strPrimaryFilter;
                                 if (!fun.ToString().Contains("Spec")) row[fun.ToString()] = GetData(new string[] { filter }, DataField, fun, NSigma);
@@ -827,6 +827,23 @@ public class Pivot
                         correspondingPSigmaPos.Add(stdDevNSigmaPos);
                     }
                     return correspondingPSigmaPos.OrderByDescending(x => x.Item2).ToList()[0].Item1;
+
+                case AggregateFunction.NSigmaNegCorrespondingAvg:
+                    List<Tuple<object, object>> correspondingNSigmaAvg = new List<Tuple<object, object>>();
+                    foreach (var e in FilteredRows)
+                    {
+                        Tuple<object, object> stdDevNSigmaNed = new Tuple<object, object>(GetAverage(e.Select(y => y.Field<object>(DataField)).ToArray()), GetNSigmaNeg(e.Select(y => y.Field<object>(DataField)).ToArray(), NSigma));
+                        correspondingNSigmaAvg.Add(stdDevNSigmaNed);
+                    }
+                    return correspondingNSigmaAvg.OrderBy(x => x.Item2).ToList()[0].Item1;
+                case AggregateFunction.NSigmaPosCorrespondingAvg:
+                    List<Tuple<object, object>> correspondingPSigmaAvg = new List<Tuple<object, object>>();
+                    foreach (var e in FilteredRows)
+                    {
+                        Tuple<object, object> stdDevNSigmaPos = new Tuple<object, object>(GetAverage(e.Select(y => y.Field<object>(DataField)).ToArray()), GetNSigmaPos(e.Select(y => y.Field<object>(DataField)).ToArray(), NSigma));
+                        correspondingPSigmaAvg.Add(stdDevNSigmaPos);
+                    }
+                    return correspondingPSigmaAvg.OrderByDescending(x => x.Item2).ToList()[0].Item1;
                 default:
                     return null;
             }
@@ -926,5 +943,7 @@ public enum AggregateFunction
     NSigmaNegMin = 16,
     NSigmaPosMax = 17,
     NSigmaNegCorrespondingStdDev = 18,
-    NSigmaPosCorrespondingStdDev = 19
+    NSigmaNegCorrespondingAvg = 20,
+    NSigmaPosCorrespondingStdDev = 19,
+    NSigmaPosCorrespondingAvg = 21
 }

@@ -123,7 +123,7 @@ namespace SummaryToolForm
                 dtSum = sm.SummaryData(InputFields1.Datafield[0], InputFields1.SumRowfield, InputFields1.SumColumnfield, InputFields1.Aggregate, InputFields1.NSigma);
                 toolStripStatusLabel = sm.errormsg;
 
-                dhtSum = sm.HighSummaryData(InputFields1.Datafield[0],InputFields1.Iterator,InputFields1.SumRowfield, InputFields1.SumColumnfield, new AggregateFunction[] { AggregateFunction.Max,AggregateFunction.Min,AggregateFunction.Average,AggregateFunction.NSigmaNegMin,AggregateFunction.NSigmaPosMax,AggregateFunction.NSigmaNegCorrespondingStdDev,AggregateFunction.NSigmaPosCorrespondingStdDev}, InputFields1.NSigma);
+                dhtSum = sm.HighSummaryData(InputFields1.Datafield[0], InputFields1.Iterator, InputFields1.SumRowfield, InputFields1.SumColumnfield, new AggregateFunction[] { AggregateFunction.Max, AggregateFunction.Min, AggregateFunction.Average, AggregateFunction.NSigmaNegMin, AggregateFunction.NSigmaPosMax, AggregateFunction.NSigmaNegCorrespondingStdDev, AggregateFunction.NSigmaPosCorrespondingStdDev, AggregateFunction.NSigmaNegCorrespondingAvg, AggregateFunction.NSigmaPosCorrespondingAvg }, InputFields1.NSigma);
                 toolStripStatusLabel += sm.errormsg;
 
                 SumdataGridView.DataSource = dtSum.DefaultView;
