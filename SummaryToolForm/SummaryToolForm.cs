@@ -325,7 +325,8 @@ namespace SummaryToolForm
                 if (StatisticsSelectedDNDLV.Items[i].Text == AggregateFunction.SpecMin.ToString()) InputFields1.Aggregate[i] = AggregateFunction.SpecMin;
                 if (StatisticsSelectedDNDLV.Items[i].Text == AggregateFunction.SpecMax.ToString()) InputFields1.Aggregate[i] = AggregateFunction.SpecMax;
                 if (StatisticsSelectedDNDLV.Items[i].Text == AggregateFunction.SpecTypical.ToString()) InputFields1.Aggregate[i] = AggregateFunction.SpecTypical;
-
+                if (StatisticsSelectedDNDLV.Items[i].Text == AggregateFunction.CPK.ToString()) InputFields1.Aggregate[i] = 
+AggregateFunction.CPK;
                 //if (StatisticsSelectedDNDLV.Items[i].Text == "") InputFields1.Aggregate[i] = AggregateFunction.Max;
             }
             List<AggregateFunction> lst_agr = InputFields1.Aggregate.ToList<AggregateFunction>();

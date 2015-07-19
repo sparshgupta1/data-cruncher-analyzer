@@ -387,7 +387,20 @@ public class Pivot
                                 filter += " and " + ColumnFields[i] + " = '" + strColValues[i] + "'";
                             foreach (var fun in Aggregate)
                             {
-                                if (!fun.ToString().Contains("Spec")) row[col + '#' + fun.ToString()] = GetData(new string[] { filter }, DataField, fun, NSigma);
+                                if (!fun.ToString().Contains("Spec"))
+                                {
+                                    if (fun.ToString().Contains("CPK"))
+                                    {
+                                        object spec_max = IncludeSpec("", DataField, "SpecMax");
+                                        object spec_min = IncludeSpec("", DataField, "SpecMin");
+                                        if (spec_max.ToString() == "No Spec" || spec_min.ToString() == "No Spec")
+                                            row[fun.ToString()] = "No Spec";
+                                        else
+                                            row[fun.ToString()] = ObtainCPK(double.Parse(spec_max.ToString()), double.Parse(spec_min.ToString()), new string[] { filter }, DataField, NSigma);
+                                    }
+                                    else
+                                        row[col + '#' + fun.ToString()] = GetData(new string[] { filter }, DataField, fun, NSigma);
+                                }
                                 else
                                 {
                                     //filter = strSpecFilter;
@@ -401,7 +414,20 @@ public class Pivot
                         foreach (var fun in Aggregate)
                         {
                             string filter = strFilter;
-                            if (!fun.ToString().Contains("Spec")) row[fun.ToString()] = GetData(new string[] { filter }, DataField, fun, NSigma);
+                            if (!fun.ToString().Contains("Spec"))
+                            {
+                                if (fun.ToString().Contains("CPK"))
+                                {
+                                    object spec_max = IncludeSpec("", DataField, "SpecMax");
+                                    object spec_min = IncludeSpec("", DataField, "SpecMin");
+                                    if (spec_max.ToString() == "No Spec" || spec_min.ToString() == "No Spec")
+                                        row[fun.ToString()] = "No Spec";
+                                    else
+                                        row[fun.ToString()] = ObtainCPK(double.Parse(spec_max.ToString()), double.Parse(spec_min.ToString()), new string[] { filter }, DataField, NSigma);
+                                }
+                                else
+                                    row[fun.ToString()] = GetData(new string[] { filter }, DataField, fun, NSigma);
+                            }
                             else
                             {
                                 filter = strSpecFilter;
@@ -438,7 +464,20 @@ public class Pivot
 
                     foreach (var fun in Aggregate)
                     {
-                        if (!fun.ToString().Contains("Spec")) row[col + '#' + fun.ToString()] = GetData(new string[] { filter }, DataField, fun, NSigma);
+                        if (!fun.ToString().Contains("Spec"))
+                        {
+                            if (fun.ToString().Contains("CPK"))
+                            {
+                                object spec_max = IncludeSpec("", DataField, "SpecMax");
+                                object spec_min = IncludeSpec("", DataField, "SpecMin");
+                                if (spec_max.ToString() == "No Spec" || spec_min.ToString() == "No Spec")
+                                    row[fun.ToString()] = "No Spec";
+                                else
+                                    row[fun.ToString()] = ObtainCPK(double.Parse(spec_max.ToString()), double.Parse(spec_min.ToString()), new string[] { filter }, DataField, NSigma);
+                            }
+                            else
+                                row[col + '#' + fun.ToString()] = GetData(new string[] { filter }, DataField, fun, NSigma);
+                        }
                         else
                         {
                             //filter = strSpecFilter;
@@ -547,7 +586,17 @@ public class Pivot
                             {
                                 if (!fun.ToString().Contains("Spec"))
                                 {
-                                    row[col + '#' + fun.ToString()] = GetData(new string[] { filter }, DataField, fun, NSigma);
+                                    if (fun.ToString().Contains("CPK"))
+                                    {
+                                        object spec_max = IncludeSpec("", DataField, "SpecMax");
+                                        object spec_min = IncludeSpec("", DataField, "SpecMin");
+                                        if (spec_max.ToString() == "No Spec" || spec_min.ToString() == "No Spec")
+                                            row[fun.ToString()] = "No Spec";
+                                        else
+                                            row[fun.ToString()] = ObtainCPK(double.Parse(spec_max.ToString()), double.Parse(spec_min.ToString()), new string[] { filter }, DataField, NSigma);
+                                    }
+                                    else
+                                        row[col + '#' + fun.ToString()] = GetData(new string[] { filter }, DataField, fun, NSigma);
                                 }
                                 else
                                 {
@@ -564,9 +613,21 @@ public class Pivot
                             string filter = strFilter;
                             if (!fun.ToString().Contains("Spec"))
                             {
-                                row[fun.ToString()] = GetData(new string[] { filter }, DataField, fun, NSigma);
-                                if (row[fun.ToString()].ToString() == "") { NoData = true; continue; }
-                                else NoData = false;
+                                if (fun.ToString().Contains("CPK"))
+                                {
+                                    object spec_max = IncludeSpec("", DataField, "SpecMax");
+                                    object spec_min = IncludeSpec("", DataField, "SpecMin");
+                                    if (spec_max.ToString() == "No Spec" || spec_min.ToString() == "No Spec")
+                                        row[fun.ToString()] = "No Spec";
+                                    else
+                                        row[fun.ToString()] = ObtainCPK(double.Parse(spec_max.ToString()), double.Parse(spec_min.ToString()), new string[] { filter }, DataField, NSigma);
+                                }
+                                else
+                                {
+                                    row[fun.ToString()] = GetData(new string[] { filter }, DataField, fun, NSigma);
+                                    if (row[fun.ToString()].ToString() == "") { NoData = true; continue; }
+                                    else NoData = false;
+                                }
                             }
                             else
                             {
@@ -604,7 +665,13 @@ public class Pivot
 
                     foreach (var fun in Aggregate)
                     {
-                        if (!fun.ToString().Contains("Spec")) row[col + '#' + fun.ToString()] = GetData(new string[] { filter }, DataField, fun, NSigma);
+                        if (!fun.ToString().Contains("Spec"))
+                        {
+                            if (fun.ToString().Contains("CPK"))
+                                Console.Write("ff");
+                            else
+                                row[col + '#' + fun.ToString()] = GetData(new string[] { filter }, DataField, fun, NSigma);
+                        }
                         else
                         {
                             //filter = strSpecFilter;
@@ -853,6 +920,26 @@ public class Pivot
             return "#Error";
         }
     }
+
+    public object ObtainCPK(double spec_max, double spec_min, string[] Filters, string DataField, double NSigma = 3)
+    {
+        try
+        {
+            List<DataRow[]> FilteredRows = new List<DataRow[]>();
+            foreach (string filter in Filters)
+            {
+                FilteredRows.Add(_SourceTable.Select(filter));
+            }
+            object[] objList = FilteredRows.Select(x => x.Select(y => y.Field<object>(DataField))).SelectMany(i => i).ToArray();
+            return ((spec_max - spec_min) / (double)(6 * (double)GetStdev(objList)));
+        }
+        catch (Exception ex)
+        {
+            return "#Error";
+        }
+    }
+
+
     public string GetFullArray(object[] objList)
     {
         string[] strList = Array.ConvertAll(objList, p => (p ?? String.Empty).ToString());
@@ -945,5 +1032,6 @@ public enum AggregateFunction
     NSigmaNegCorrespondingStdDev = 18,
     NSigmaNegCorrespondingAvg = 20,
     NSigmaPosCorrespondingStdDev = 19,
-    NSigmaPosCorrespondingAvg = 21
+    NSigmaPosCorrespondingAvg = 21,
+    CPK = 22
 }
