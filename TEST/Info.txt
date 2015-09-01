@@ -1,1 +1,0 @@
-Input Row as well as X axis row - DataTable will have those columns
